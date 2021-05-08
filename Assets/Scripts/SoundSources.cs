@@ -81,7 +81,7 @@ public class SoundSources : NetworkBehaviour
         sound.duration = 5f;
         m_SoundSourcesCPU[i] = sound;
 
-        m_BufferEnd = math.max(m_BufferEnd, i);
+        m_BufferEnd = math.max(m_BufferEnd, i + 1);
 
         //Debug.Log("Data changed");
     }
