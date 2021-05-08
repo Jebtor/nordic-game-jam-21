@@ -1,5 +1,11 @@
 {
   "dependencies": {
+    "com.svens.command-terminal": {
+      "version": "file:C:/git/nordic-game-jam-21/LocalPackages/CommandTerminal",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {}
+    },
     "com.unity.ext.nunit": {
       "version": "1.0.6",
       "depth": 1,
