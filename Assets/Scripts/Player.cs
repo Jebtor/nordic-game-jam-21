@@ -24,8 +24,7 @@ public class Player : NetworkBehaviour
         if (mouse.leftButton.wasReleasedThisFrame)
         {
             var camera = Camera.main;
-            var plane = new Plane(Vector3.up, 0f);
-            var ray = camera.ScreenPointToRay(new Vector3(mouse.position.x.ReadValue(), mouse.position.y.ReadValue()));
+            var ray = new Ray(camera.transform.position, camera.transform.forward);//camera.ScreenPointToRay(new Vector3(mouse.position.x.ReadValue(), mouse.position.y.ReadValue()));
 
             if (Physics.Raycast(ray, out var hit))
             {
