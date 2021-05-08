@@ -27,9 +27,10 @@ public class Player : NetworkBehaviour
             var plane = new Plane(Vector3.up, 0f);
             var ray = camera.ScreenPointToRay(new Vector3(mouse.position.x.ReadValue(), mouse.position.y.ReadValue()));
 
-            plane.Raycast(ray, out var distance);
-            var hit = ray.GetPoint(distance);
-            SpawnNewSoundAt_ServerRPC(hit);
+            if (Physics.Raycast(ray, out var hit))
+            {
+                SpawnNewSoundAt_ServerRPC(hit.point);
+            }
         }
     }
 

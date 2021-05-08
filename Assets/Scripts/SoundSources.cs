@@ -86,7 +86,6 @@ public class SoundSources : NetworkBehaviour
         //Debug.Log("Data changed");
     }
 
-
     void Update()
     {
         if (!NetworkManager.Singleton.IsHost && !NetworkManager.Singleton.IsConnectedClient)
@@ -118,7 +117,6 @@ public class SoundSources : NetworkBehaviour
 
         m_BufferEnd++;
     }
-
 
     void UploadToGPU()
     {
