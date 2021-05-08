@@ -11,6 +11,7 @@ public class SoundSources : MonoBehaviour
     {
         public float3 origin;
         public float time;
+        public float duration;
     }
 
     static readonly int s_TimeProperty = Shader.PropertyToID("_GameTime");
@@ -41,6 +42,9 @@ public class SoundSources : MonoBehaviour
 
     void Update()
     {
+        while (m_BufferStart < m_BufferEnd && Time.time > m_SoundSourcesCPU[m_BufferStart].time + m_SoundSourcesCPU[m_BufferStart].duration)
+            m_BufferStart++;
+
         HandleInput();
         UploadToGPU();
     }
@@ -64,7 +68,12 @@ public class SoundSources : MonoBehaviour
     {
         Debug.Assert(m_BufferEnd < k_Max);
 
-        m_SoundSourcesCPU[m_BufferEnd] = new SoundSource { origin = point, time = Time.time };
+        m_SoundSourcesCPU[m_BufferEnd] = new SoundSource
+        {
+            origin = point,
+            time = Time.time,
+            duration = 5f,
+        };
 
         m_BufferEnd++;
 
@@ -73,10 +82,11 @@ public class SoundSources : MonoBehaviour
 
     void UploadToGPU()
     {
-        m_SoundSourcesGPU.SetData(m_SoundSourcesCPU);
+        var count = m_BufferEnd - m_BufferStart;
+        m_SoundSourcesGPU.SetData(m_SoundSourcesCPU, m_BufferStart, 0, count);
 
         Shader.SetGlobalFloat(s_TimeProperty, Time.time);
-        Shader.SetGlobalFloat(s_SoundCountProperty, m_BufferEnd);
+        Shader.SetGlobalFloat(s_SoundCountProperty, count);
         Shader.SetGlobalBuffer(s_SoundSourcesBufferProperty, m_SoundSourcesGPU);
     }
 }
