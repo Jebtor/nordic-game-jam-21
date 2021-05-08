@@ -12,11 +12,14 @@ public class Player : NetworkBehaviour
     SoundSources m_SoundManager;
     KinematicBody m_KinematicBody;
 
+    bool m_IsGrounded;
+
     void Start()
     {
         m_SoundManager = FindObjectOfType<SoundSources>();
         countDown = SoundInterval;
         m_KinematicBody = GetComponent<KinematicBody>();
+        m_IsGrounded = m_KinematicBody.isGrounded;
     }
 
     void Update()
@@ -35,6 +38,20 @@ public class Player : NetworkBehaviour
 
             countDown = SoundInterval;
         }
+
+        if(!m_IsGrounded && m_KinematicBody.isGrounded)
+        {
+            Land();
+        }
+
+        m_IsGrounded = m_KinematicBody.isGrounded;
+    }
+
+    void Land()
+    {
+        var ray = new Ray(transform.position, Vector3.down);
+        if(Physics.Raycast(ray, out var hit, 1.3f))
+            SpawnNewSoundAt_ServerRPC(hit.point);
     }
 
     void HandleInput()
