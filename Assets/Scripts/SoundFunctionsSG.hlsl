@@ -45,7 +45,7 @@
 			if (distanceToPoint > waveStart && distanceToPoint < waveEnd)
 			{
 				float normalizedWaveDistance = (distanceToPoint - waveStart) / band;
-				float fade = sin(normalizedWaveDistance * 3.14);
+				float fade = 1;// sin(normalizedWaveDistance * 3.14);
 				float value = saturate(fade - normalizedLifeTime);
 
 				brightness = max(brightness, value);
