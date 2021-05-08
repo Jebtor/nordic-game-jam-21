@@ -1,0 +1,13 @@
+{
+  "name": "com.svens.command-terminal",
+  "description": "Command Terminal",
+  "version": "0.0.1",
+  "unity": "2019.4",
+  "unityRelease": "1f1",
+  "displayName": "Command Terminal",
+  "dependencies": {
+  },
+  "keywords": [
+    "Tools"
+  ]
+}
