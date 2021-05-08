@@ -108,6 +108,14 @@ public class Player : NetworkBehaviour
                     player.Die_clientRPC();
             }
         }
+
+        Shoot_ClientRPC();
+    }
+
+    [ClientRpc]
+    public void Shoot_ClientRPC()
+    {
+
     }
 
     [ServerRpc]
