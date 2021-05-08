@@ -1,5 +1,7 @@
 using MLAPI;
 using MLAPI.Messaging;
+using MLAPI.NetworkVariable;
+using System.Net.NetworkInformation;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngineInternal;
@@ -9,12 +11,16 @@ public class Player : NetworkBehaviour
     [SerializeField] float SoundInterval = 1f;
     [SerializeField] bool m_CaptureMouse = true;
 
+    public bool IsAlive => Health.Value > 0;
+
     float countDown;
 
     SoundSources m_SoundManager;
     KinematicBody m_KinematicBody;
 
     bool m_IsGrounded;
+
+    NetworkVariableInt Health;
 
     void Start()
     {
@@ -25,6 +31,15 @@ public class Player : NetworkBehaviour
 
         if (m_CaptureMouse)
             Cursor.lockState = CursorLockMode.Locked;
+
+        var settings = new NetworkVariableSettings 
+        { 
+            ReadPermission = NetworkVariablePermission.Everyone, 
+            WritePermission = NetworkVariablePermission.ServerOnly, 
+            SendTickrate = 120f 
+        };
+
+        Health = new NetworkVariableInt(settings, 10);
     }
 
     void Update()
@@ -84,8 +99,13 @@ public class Player : NetworkBehaviour
         {
             if (hit.transform.CompareTag("Player"))
             {
-                Debug.Log($"Hit player {hit.transform.name}");
-                hit.transform.GetComponent<Player>().GetHit_ClientRPC();
+                var player = hit.transform.GetComponent<Player>();
+                Debug.Log($"Hit player {player.name}");
+                player.GetHit_ClientRPC();
+                player.Health.Value--;
+
+                if (player.Health.Value <= 0)
+                    player.Die_clientRPC();
             }
         }
     }
@@ -99,6 +119,14 @@ public class Player : NetworkBehaviour
     [ClientRpc]
     public void GetHit_ClientRPC()
     {
-        Debug.Log("I got hit");
+        if(NetworkObject.IsLocalPlayer)
+            Debug.Log("I got hit");
+    }
+
+    [ClientRpc]
+    public void Die_clientRPC()
+    {
+        if (NetworkObject.IsLocalPlayer)
+            Debug.Log("I died");
     }
 }
