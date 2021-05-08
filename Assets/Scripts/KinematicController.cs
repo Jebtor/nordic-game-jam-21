@@ -1,3 +1,4 @@
+using Cinemachine;
 using MLAPI;
 using System.Collections;
 using System.Collections.Generic;
@@ -17,6 +18,9 @@ public class KinematicController : MonoBehaviour
     Vector2 m_Look;
     Vector2 m_Move;
     bool m_Jump;
+    bool m_ExecutedJump;
+
+    Transform m_Camera;
     
     void Start()
     {
@@ -27,20 +31,32 @@ public class KinematicController : MonoBehaviour
 
         m_PlayerInput = FindObjectOfType<PlayerInput>();
         m_KinematicBody = GetComponent<KinematicBody>();
+
+        var camera = FindObjectOfType<CinemachineVirtualCamera>();
+        camera.Follow = transform;
+
+        m_Camera = Camera.main.transform;
+
+        m_ExecutedJump = false;
     }
 
     void Update()
     {
         m_Look = m_PlayerInput.actions["Look"].ReadValue<Vector2>();
         m_Move = m_PlayerInput.actions["Move"].ReadValue<Vector2>();
-        m_Jump = m_PlayerInput.actions["Jump"].triggered;
+        var jump = m_PlayerInput.actions["Jump"].triggered;
+        
+        if (jump && !m_ExecutedJump)
+        {
+            m_Jump = true;
+            m_ExecutedJump = true;
+        }
     }
-
 
     void FixedUpdate()
     {
         var rotationDelta = m_Look;
-        var rotation = m_KinematicBody.rigidbody.rotation * Quaternion.Euler(0f, .5f * rotationDelta.x, 0f);
+        var rotation = Quaternion.Euler(0f, m_Camera.rotation.eulerAngles.y, 0f);// m_KinematicBody.rigidbody.rotation * Quaternion.Euler(0f, .5f * rotationDelta.x, 0f);
         m_KinematicBody.Rotate(rotation);
 
         //  Always deriv your motion from the kinematic body velocity
@@ -64,6 +80,8 @@ public class KinematicController : MonoBehaviour
             if (m_Jump)
             {
                 moveDirection.y = jumpSpeed;
+                m_ExecutedJump = false;
+                m_Jump = false;
             }
         }
 

@@ -24,11 +24,7 @@ public class SoundSources : NetworkBehaviour
 
     ComputeBuffer m_SoundSourcesGPU;
     NativeArray<SoundSource> m_SoundSourcesCPU;
-
-
     NetworkList<Vector3> m_SoundPositions;
-    //NetworkList<float> m_SoundTime;
-    //NetworkList<float> m_SoundDurations;
 
     int m_BufferEnd;
     int m_BufferStart;
@@ -46,12 +42,7 @@ public class SoundSources : NetworkBehaviour
         };
 
         m_SoundPositions = new NetworkList<Vector3>(settings);
-        //m_SoundTime = new NetworkList<float>(settings);
-        //m_SoundDurations = new NetworkList<float>(settings);
-
         m_SoundPositions.OnListChanged += OnPositionsChanged;
-        //m_SoundTime.OnListChanged += OnTimesChanged;
-        //m_SoundDurations.OnListChanged += OnDurationsChanged;
 
         m_BufferStart = m_BufferEnd = 0;
     }
@@ -62,9 +53,6 @@ public class SoundSources : NetworkBehaviour
         m_SoundSourcesCPU.Dispose();
 
         m_SoundPositions.OnListChanged -= OnPositionsChanged;
-        //m_SoundTime.OnListChanged -= OnTimesChanged;
-        //m_SoundDurations.OnListChanged -= OnDurationsChanged;
-
         m_BufferStart = m_BufferEnd = 0;
     }
 
@@ -82,8 +70,6 @@ public class SoundSources : NetworkBehaviour
         m_SoundSourcesCPU[i] = sound;
 
         m_BufferEnd = math.max(m_BufferEnd, i + 1);
-
-        //Debug.Log("Data changed");
     }
 
     void Update()
@@ -110,9 +96,6 @@ public class SoundSources : NetworkBehaviour
         };
 
         m_SoundPositions.Add(soundSource.origin);
-        //m_SoundDurations.Add(soundSource.duration);
-        //m_SoundTime.Add(soundSource.time);
-
         m_SoundSourcesCPU[m_BufferEnd] = soundSource;
 
         m_BufferEnd++;
