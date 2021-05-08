@@ -1,19 +1,20 @@
 using MLAPI;
 using MLAPI.Messaging;
 using MLAPI.NetworkVariable;
-using System.Net.NetworkInformation;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngineInternal;
 
 public class Player : NetworkBehaviour
 {
-    [SerializeField] float SoundInterval = 1f;
     [SerializeField] bool m_CaptureMouse = true;
+
+    [SerializeField] float m_StepSoundCoolDown = 1f;
+    [SerializeField] float m_ShootCooldown = .1f;
 
     public bool IsAlive => Health.Value > 0;
 
-    float countDown;
+    float m_StepCountDown;
+    float m_ShootCountDown;
 
     SoundSources m_SoundManager;
     KinematicBody m_KinematicBody;
@@ -25,7 +26,6 @@ public class Player : NetworkBehaviour
     void Start()
     {
         m_SoundManager = FindObjectOfType<SoundSources>();
-        countDown = SoundInterval;
         m_KinematicBody = GetComponent<KinematicBody>();
         m_IsGrounded = m_KinematicBody.isGrounded;
 
@@ -40,6 +40,9 @@ public class Player : NetworkBehaviour
         };
 
         Health = new NetworkVariableInt(settings, 10);
+
+        m_StepCountDown = m_StepSoundCoolDown;
+        m_ShootCountDown = m_ShootCooldown;
     }
 
     void Update()
@@ -47,8 +50,8 @@ public class Player : NetworkBehaviour
         if (NetworkObject.IsOwner)
             HandleInput();
 
-        countDown -= Time.deltaTime;
-        if(countDown <= 0f)
+        m_StepCountDown -= Time.deltaTime;
+        if(m_StepCountDown <= 0f)
         {
             var ray = new Ray(transform.position, Vector3.down);
             if(m_KinematicBody.isGrounded && Physics.Raycast(ray, out var hit, 1.3f))
@@ -56,7 +59,7 @@ public class Player : NetworkBehaviour
                 SpawnNewSoundAt_ServerRPC(hit.point);
             }
 
-            countDown = SoundInterval;
+            m_StepCountDown = m_StepSoundCoolDown;
         }
 
         if(!m_IsGrounded && m_KinematicBody.isGrounded)
@@ -76,8 +79,10 @@ public class Player : NetworkBehaviour
 
     void HandleInput()
     {
+        m_ShootCountDown -= Time.deltaTime;
+
         var mouse = Mouse.current;
-        if (mouse.leftButton.wasReleasedThisFrame)
+        if (mouse.leftButton.isPressed && m_ShootCountDown <= 0f)
         {
             var camera = Camera.main;
             var ray = new Ray(camera.transform.position, camera.transform.forward);//camera.ScreenPointToRay(new Vector3(mouse.position.x.ReadValue(), mouse.position.y.ReadValue()));
@@ -86,6 +91,7 @@ public class Player : NetworkBehaviour
             {
                 SpawnNewSoundAt_ServerRPC(hit.point);
                 Shoot_ServerRPC(ray.origin, ray.direction);
+                m_ShootCountDown = m_ShootCooldown;
             }
         }
     }
