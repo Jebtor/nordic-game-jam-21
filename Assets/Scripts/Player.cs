@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 public class Player : NetworkBehaviour
 {
     [SerializeField] float SoundInterval = 1f;
+    [SerializeField] bool m_CaptureMouse = true;
 
     float countDown;
 
@@ -20,6 +21,9 @@ public class Player : NetworkBehaviour
         countDown = SoundInterval;
         m_KinematicBody = GetComponent<KinematicBody>();
         m_IsGrounded = m_KinematicBody.isGrounded;
+
+        if (m_CaptureMouse)
+            Cursor.lockState = CursorLockMode.Locked;
     }
 
     void Update()
