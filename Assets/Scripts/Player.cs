@@ -2,6 +2,7 @@ using MLAPI;
 using MLAPI.Messaging;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngineInternal;
 
 public class Player : NetworkBehaviour
 {
@@ -69,6 +70,22 @@ public class Player : NetworkBehaviour
             if (Physics.Raycast(ray, out var hit))
             {
                 SpawnNewSoundAt_ServerRPC(hit.point);
+                Shoot_ServerRPC(ray.origin, ray.direction);
+            }
+        }
+    }
+
+    [ServerRpc]
+    public void Shoot_ServerRPC(Vector3 origin, Vector3 direction)
+    {
+        var ray = new Ray(origin, direction);
+
+        if (Physics.Raycast(ray, out var hit))
+        {
+            if (hit.transform.CompareTag("Player"))
+            {
+                Debug.Log($"Hit player {hit.transform.name}");
+                hit.transform.GetComponent<Player>().GetHit_ClientRPC();
             }
         }
     }
@@ -77,5 +94,11 @@ public class Player : NetworkBehaviour
     public void SpawnNewSoundAt_ServerRPC(Vector3 point)
     {
         m_SoundManager.SpawnSounceAt(point);
+    }
+
+    [ClientRpc]
+    public void GetHit_ClientRPC()
+    {
+        Debug.Log("I got hit");
     }
 }
