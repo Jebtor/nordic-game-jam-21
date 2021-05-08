@@ -5,17 +5,36 @@ using UnityEngine.InputSystem;
 
 public class Player : NetworkBehaviour
 {
+    [SerializeField] float SoundInterval = 1f;
+
+    float countDown;
+
     SoundSources m_SoundManager;
+    KinematicBody m_KinematicBody;
 
     void Start()
     {
         m_SoundManager = FindObjectOfType<SoundSources>();
+        countDown = SoundInterval;
+        m_KinematicBody = GetComponent<KinematicBody>();
     }
 
     void Update()
     {
-        if(NetworkObject.IsOwner)
+        if (NetworkObject.IsOwner)
             HandleInput();
+
+        countDown -= Time.deltaTime;
+        if(countDown <= 0f)
+        {
+            var ray = new Ray(transform.position, Vector3.down);
+            if(m_KinematicBody.isGrounded && Physics.Raycast(ray, out var hit, 1.3f))
+            {
+                SpawnNewSoundAt_ServerRPC(hit.point);
+            }
+
+            countDown = SoundInterval;
+        }
     }
 
     void HandleInput()
