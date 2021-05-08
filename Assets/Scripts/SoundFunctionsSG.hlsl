@@ -1,14 +1,19 @@
 #ifndef MYHLSLINCLUDE_INCLUDED
 #define MYHLSLINCLUDE_INCLUDED
 
-	uniform StructuredBuffer<float3> _SoundOriginsBuffer : register(t1);
-	uniform StructuredBuffer<float> _SoundTimesBuffer : register(t2);
+	struct SoundSource
+	{
+		float3 origin;
+		float time;
+	};
+
+	uniform StructuredBuffer<SoundSource> _SoundSourcesBuffer : register(t1);
 	uniform float _GameTime;
-	uniform float _SoundsCount;
+	uniform float _SoundCount;
 	
 	void MyFunction_float(float3 position, out float brightness)
 	{
-		int count = (int)_SoundsCount;
+		int count = _SoundCount;
 		float waveVelocity = 1;
 		float waveBandWidth = 0.2;	
 		
@@ -19,11 +24,10 @@
 		
 		for(int i = 0; i < count; i++)
 		{
-			float3 origin = _SoundOriginsBuffer[i];
-			float dist = distance(position, origin) * waveVelocity;
-			
-			float startTime = _SoundTimesBuffer[i];
-			float waveDistance = _GameTime - startTime;
+			SoundSource sound = _SoundSourcesBuffer[i];
+
+			float dist = distance(position, sound.origin) * waveVelocity;
+			float waveDistance = _GameTime - sound.time;
 			
 			if(dist > waveDistance - waveBandWidth && dist < waveDistance)
 				brightness = max(brightness, 1);

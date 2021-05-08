@@ -5,39 +5,38 @@ using UnityEngine.InputSystem;
 
 public class SoundSources : MonoBehaviour
 {
-    const int k_Max = 100;
+    const int k_Max = 1024;
 
-    static readonly int TimeProperty = Shader.PropertyToID("_GameTime");
-    static readonly int SoundsCountProperty = Shader.PropertyToID("_SoundsCount");
-    static readonly int SoundsOriginsBufferProperty = Shader.PropertyToID("_SoundOriginsBuffer");
-    static readonly int SoundsTimesBufferProperty = Shader.PropertyToID("_SoundTimesBuffer");
-
-    ComputeBuffer m_SoundOriginsGPU;
-    NativeArray<float3> m_SoundOriginsCPU;
-
-    ComputeBuffer m_SoundTimesGPU;
-    NativeArray<float> m_SoundTimesCPU;
-
-    int count;
-
-    unsafe void Start()
+    struct SoundSource
     {
-        m_SoundOriginsGPU = new ComputeBuffer(k_Max, sizeof(float3), ComputeBufferType.Structured);
-        m_SoundOriginsCPU = new NativeArray<float3>(k_Max, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
-
-        m_SoundTimesGPU = new ComputeBuffer(k_Max, sizeof(float), ComputeBufferType.Structured);
-        m_SoundTimesCPU = new NativeArray<float>(k_Max, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
-
-        count = 0;
+        public float3 origin;
+        public float time;
     }
 
-    void OnDisable()
-    {
-        m_SoundOriginsGPU?.Dispose();
-        m_SoundOriginsCPU.Dispose();
+    static readonly int s_TimeProperty = Shader.PropertyToID("_GameTime");
+    static readonly int s_SoundCountProperty = Shader.PropertyToID("_SoundCount");
+    static readonly int s_SoundSourcesBufferProperty = Shader.PropertyToID("_SoundSourcesBuffer");
 
-        m_SoundTimesGPU?.Dispose();
-        m_SoundTimesCPU.Dispose();
+    ComputeBuffer m_SoundSourcesGPU;
+    NativeArray<SoundSource> m_SoundSourcesCPU;
+
+    int m_BufferEnd;
+    int m_BufferStart;
+
+    unsafe void OnEnable()
+    {
+        m_SoundSourcesGPU = new ComputeBuffer(k_Max, sizeof(SoundSource), ComputeBufferType.Structured);
+        m_SoundSourcesCPU = new NativeArray<SoundSource>(k_Max, Allocator.Persistent, NativeArrayOptions.UninitializedMemory);
+
+        m_BufferStart = m_BufferEnd = 0;
+    }
+
+    unsafe void OnDisable()
+    {
+        m_SoundSourcesGPU?.Dispose();
+        m_SoundSourcesCPU.Dispose();
+
+        m_BufferStart = m_BufferEnd = 0;
     }
 
     void Update()
@@ -55,7 +54,6 @@ public class SoundSources : MonoBehaviour
             var plane = new Plane(Vector3.up, 0f);
             var ray = camera.ScreenPointToRay(new Vector3(mouse.position.x.ReadValue(), mouse.position.y.ReadValue()));
 
-            //var ray = new Ray { direction = camera.transform.forward, origin = camera.transform.position };
             plane.Raycast(ray, out var distance);
             var hit = ray.GetPoint(distance);
             SpawnNewSoundAt(hit);
@@ -64,23 +62,21 @@ public class SoundSources : MonoBehaviour
 
     public void SpawnNewSoundAt(float3 point)
     {
-        Debug.Assert(count < k_Max);
+        Debug.Assert(m_BufferEnd < k_Max);
 
-        m_SoundOriginsCPU[count] = point;
-        m_SoundTimesCPU[count] = Time.time;
-        count++;
+        m_SoundSourcesCPU[m_BufferEnd] = new SoundSource { origin = point, time = Time.time };
 
-        Debug.Log($"sound {count} added at {point}.");
+        m_BufferEnd++;
+
+        Debug.Log($"sound {m_BufferEnd} added at {point}.");
     }
 
     void UploadToGPU()
     {
-        m_SoundOriginsGPU.SetData(m_SoundOriginsCPU);
+        m_SoundSourcesGPU.SetData(m_SoundSourcesCPU);
 
-        Shader.SetGlobalFloat(TimeProperty, Time.time);
-        Shader.SetGlobalFloat(SoundsCountProperty, count);
-        Shader.SetGlobalBuffer(SoundsOriginsBufferProperty, m_SoundOriginsGPU);
-        Shader.SetGlobalBuffer(SoundsTimesBufferProperty, m_SoundTimesGPU);
-
+        Shader.SetGlobalFloat(s_TimeProperty, Time.time);
+        Shader.SetGlobalFloat(s_SoundCountProperty, m_BufferEnd);
+        Shader.SetGlobalBuffer(s_SoundSourcesBufferProperty, m_SoundSourcesGPU);
     }
 }
