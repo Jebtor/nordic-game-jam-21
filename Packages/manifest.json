@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "com.svens.command-terminal": "file:C:/git/nordic-game-jam-21/LocalPackages/CommandTerminal",
+    "com.svens.command-terminal": "file:../LocalPackages/CommandTerminal",
     "com.unity.ide.visualstudio": "2.0.7",
     "com.unity.ide.vscode": "1.2.3",
     "com.unity.inputsystem": "1.0.2",

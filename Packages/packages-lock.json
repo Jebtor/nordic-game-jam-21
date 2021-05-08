@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "com.svens.command-terminal": {
-      "version": "file:C:/git/nordic-game-jam-21/LocalPackages/CommandTerminal",
+      "version": "file:../LocalPackages/CommandTerminal",
       "depth": 0,
       "source": "local",
       "dependencies": {}
