@@ -27,6 +27,7 @@ public class KinematicController : MonoBehaviour
         if (!GetComponent<NetworkObject>().IsLocalPlayer)
         { 
             Destroy(this);
+            return;
         }
 
         m_PlayerInput = FindObjectOfType<PlayerInput>();
