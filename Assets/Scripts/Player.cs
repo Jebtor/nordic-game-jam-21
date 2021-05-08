@@ -18,6 +18,7 @@ public class Player : NetworkBehaviour
 
     SoundSources m_SoundManager;
     KinematicBody m_KinematicBody;
+    UIWiring m_UIWiring;
 
     bool m_IsGrounded;
 
@@ -26,7 +27,9 @@ public class Player : NetworkBehaviour
     void Start()
     {
         m_SoundManager = FindObjectOfType<SoundSources>();
+        m_UIWiring = FindObjectOfType<UIWiring>();
         m_KinematicBody = GetComponent<KinematicBody>();
+
         m_IsGrounded = m_KinematicBody.isGrounded;
 
         if (m_CaptureMouse)
@@ -41,8 +44,19 @@ public class Player : NetworkBehaviour
 
         Health = new NetworkVariableInt(settings, 10);
 
+        Health.OnValueChanged += OnHealthChanged;
+
         m_StepCountDown = m_StepSoundCoolDown;
         m_ShootCountDown = m_ShootCooldown;
+
+        if (NetworkObject.IsLocalPlayer)
+            m_UIWiring.SetHealth(Health.Value);
+    }
+
+    void OnHealthChanged(int prevValue, int newValue)
+    {
+        if (NetworkObject.IsLocalPlayer)
+            m_UIWiring.SetHealth(newValue);
     }
 
     void Update()
