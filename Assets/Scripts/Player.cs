@@ -3,6 +3,7 @@ using MLAPI.Messaging;
 using MLAPI.NetworkVariable;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class Player : NetworkBehaviour
 {
@@ -21,6 +22,7 @@ public class Player : NetworkBehaviour
 
     SoundSources m_SoundManager;
     KinematicBody m_KinematicBody;
+    KinematicController m_KinematicController;
     UIWiring m_UIWiring;
 
     bool m_IsGrounded;
@@ -41,7 +43,7 @@ public class Player : NetworkBehaviour
         m_SoundManager = FindObjectOfType<SoundSources>();
         m_UIWiring = FindObjectOfType<UIWiring>();
         m_KinematicBody = GetComponent<KinematicBody>();
-
+        m_KinematicController = GetComponent<KinematicController>();
         m_IsGrounded = m_KinematicBody.isGrounded;
 
         if (m_CaptureMouse)
@@ -64,11 +66,34 @@ public class Player : NetworkBehaviour
         if (NetworkObject.IsLocalPlayer)
             m_UIWiring.SetHealth(newValue);
     }
-
+    
+    [ServerRpc]
+    void Respawn_ServerRPC()
+    {
+        Health.Value = 10;
+        Respawn_ClientRPC();
+    }
+    
     void Update()
     {
         if (NetworkObject.IsOwner)
-            HandleInput();
+        {
+            if (!IsAlive)
+            {
+                var keyboard = Keyboard.current;
+                if (keyboard.spaceKey.wasReleasedThisFrame)
+                {
+                    Respawn_ServerRPC();
+                }
+            }
+            else
+            {
+                HandleInput();
+            }
+        }
+
+        if (!IsAlive)
+            return;
 
         m_StepCountDown -= Time.deltaTime;
         if(m_StepCountDown <= 0f)
@@ -130,7 +155,7 @@ public class Player : NetworkBehaviour
             {
                 var player = hit.transform.GetComponent<Player>();
 
-                if (player == this)
+                if (player == this || !player.IsAlive)
                     return;
 
                 Debug.Log($"Hit player {player.name}");
@@ -166,6 +191,31 @@ public class Player : NetworkBehaviour
     public void Die_clientRPC()
     {
         if (NetworkObject.IsLocalPlayer)
-            Debug.Log("I died");
+        {
+            m_KinematicBody.enabled = false;
+            m_KinematicController.enabled = false;
+            //enabled = false;
+            m_UIWiring.SetHealth(0);
+        }
+
+        GetComponentInChildren<SkinnedMeshRenderer>().enabled = false;
+        GetComponent<CapsuleCollider>().enabled = false;
+    }
+
+    [ClientRpc]
+    public void Respawn_ClientRPC()
+    {
+        if (NetworkObject.IsLocalPlayer)
+        {
+            m_KinematicBody.enabled = true;
+            m_KinematicController.enabled = true;
+            m_UIWiring.SetHealth(10);
+        }
+        else
+        {
+            GetComponentInChildren<SkinnedMeshRenderer>().enabled = true;
+        }
+
+        GetComponent<CapsuleCollider>().enabled = true;
     }
 }
