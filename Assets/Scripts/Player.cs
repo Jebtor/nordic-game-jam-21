@@ -55,7 +55,10 @@ public class Player : NetworkBehaviour
         m_ShootCountDown = m_ShootCooldown;
 
         if (NetworkObject.IsLocalPlayer)
+        {
             m_UIWiring.SetHealth(Health.Value);
+            GetComponentInChildren<SkinnedMeshRenderer>().enabled = false;
+        }
     }
 
     void OnHealthChanged(int prevValue, int newValue)
