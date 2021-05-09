@@ -142,6 +142,15 @@ public class Player : NetworkBehaviour
                 if (player.Health.Value <= 0)
                     player.Die_clientRPC();
             }
+            else if(hit.transform.CompareTag("SpeakerBoi"))
+            {
+                var speakerBoi = hit.transform.GetComponent<SpeakerBoi>();
+
+                Debug.Log($"Hit speakerboi", hit.transform);
+
+                speakerBoi.IsMuted.Value = !speakerBoi.IsMuted.Value;
+            }
+
         }
     }
 
