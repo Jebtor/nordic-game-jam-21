@@ -113,6 +113,8 @@ public class Player : NetworkBehaviour
     [ServerRpc]
     public void Shoot_ServerRPC(Vector3 origin, Vector3 direction)
     {
+        Shoot_ClientRPC();
+
         var ray = new Ray(origin, direction);
 
         if (Physics.Raycast(ray, out var hit))
@@ -120,6 +122,10 @@ public class Player : NetworkBehaviour
             if (hit.transform.CompareTag("Player"))
             {
                 var player = hit.transform.GetComponent<Player>();
+
+                if (player == this)
+                    return;
+
                 Debug.Log($"Hit player {player.name}");
                 player.GetHit_ClientRPC();
                 player.Health.Value--;
@@ -128,8 +134,6 @@ public class Player : NetworkBehaviour
                     player.Die_clientRPC();
             }
         }
-
-        Shoot_ClientRPC();
     }
 
     [ClientRpc]
