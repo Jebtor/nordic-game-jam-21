@@ -12,6 +12,9 @@ public class KinematicController : MonoBehaviour
     public float gravity = 35.0f;
     public float snapForce = 10.0f;
 
+    public GameObject animatedAvatar;
+    Animator animator;
+
     KinematicBody m_KinematicBody;
     PlayerInput m_PlayerInput;
 
@@ -24,6 +27,8 @@ public class KinematicController : MonoBehaviour
     
     void Start()
     {
+        animator = animatedAvatar.GetComponent<Animator>();
+
         if (!GetComponent<NetworkObject>().IsLocalPlayer)
         { 
             Destroy(this);
@@ -45,11 +50,18 @@ public class KinematicController : MonoBehaviour
     {
         m_Look = m_PlayerInput.actions["Look"].ReadValue<Vector2>();
         m_Move = m_PlayerInput.actions["Move"].ReadValue<Vector2>();
+
+        if (m_Move.sqrMagnitude > .1f)
+            animator.SetBool("Walking", true);
+        else
+            animator.SetBool("Walking", false);
+
         var jump = m_PlayerInput.actions["Jump"].triggered;
         
         if (jump && !m_ExecutedJump)
         {
             m_Jump = true;
+            animator.SetTrigger("Jump");
             m_ExecutedJump = true;
         }
     }

@@ -16,6 +16,9 @@ public class Player : NetworkBehaviour
     float m_StepCountDown;
     float m_ShootCountDown;
 
+    public GameObject animatedAvatar;
+    Animator animator;
+
     SoundSources m_SoundManager;
     KinematicBody m_KinematicBody;
     UIWiring m_UIWiring;
@@ -26,6 +29,8 @@ public class Player : NetworkBehaviour
 
     void Start()
     {
+        animator = animatedAvatar.GetComponent<Animator>();
+
         m_SoundManager = FindObjectOfType<SoundSources>();
         m_UIWiring = FindObjectOfType<UIWiring>();
         m_KinematicBody = GetComponent<KinematicBody>();
@@ -89,6 +94,7 @@ public class Player : NetworkBehaviour
         var ray = new Ray(transform.position, Vector3.down);
         if(Physics.Raycast(ray, out var hit, 1.3f))
             SpawnNewSoundAt_ServerRPC(hit.point);
+        animator.SetTrigger("Land");
     }
 
     void HandleInput()
