@@ -1,6 +1,7 @@
 using MLAPI;
 using MLAPI.Messaging;
 using MLAPI.NetworkVariable;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -21,11 +22,20 @@ public class Player : NetworkBehaviour
 
     SoundSources m_SoundManager;
     KinematicBody m_KinematicBody;
+    KinematicController m_KinematicController;
     UIWiring m_UIWiring;
+    SpawnPoints m_SpawnPoints;
 
     bool m_IsGrounded;
 
-    NetworkVariableInt Health;
+    NetworkVariableInt Health = new NetworkVariableInt(s_Settings, 10);
+
+    static readonly NetworkVariableSettings s_Settings = new NetworkVariableSettings
+    {
+        ReadPermission = NetworkVariablePermission.Everyone,
+        WritePermission = NetworkVariablePermission.ServerOnly,
+        SendTickrate = 120f
+    };
 
     void Start()
     {
@@ -33,21 +43,13 @@ public class Player : NetworkBehaviour
 
         m_SoundManager = FindObjectOfType<SoundSources>();
         m_UIWiring = FindObjectOfType<UIWiring>();
+        m_SpawnPoints = FindObjectOfType<SpawnPoints>();
         m_KinematicBody = GetComponent<KinematicBody>();
-
+        m_KinematicController = GetComponent<KinematicController>();
         m_IsGrounded = m_KinematicBody.isGrounded;
 
         if (m_CaptureMouse)
             Cursor.lockState = CursorLockMode.Locked;
-
-        var settings = new NetworkVariableSettings 
-        { 
-            ReadPermission = NetworkVariablePermission.Everyone, 
-            WritePermission = NetworkVariablePermission.ServerOnly, 
-            SendTickrate = 120f 
-        };
-
-        Health = new NetworkVariableInt(settings, 10);
 
         Health.OnValueChanged += OnHealthChanged;
 
@@ -59,6 +61,9 @@ public class Player : NetworkBehaviour
             m_UIWiring.SetHealth(Health.Value);
             GetComponentInChildren<SkinnedMeshRenderer>().enabled = false;
         }
+
+        int spawnPoint = UnityEngine.Random.Range(0, m_SpawnPoints.SpanwnPointCount);
+        transform.position = m_SpawnPoints.GetSpawnLocation(spawnPoint);
     }
 
     void OnHealthChanged(int prevValue, int newValue)
@@ -66,11 +71,35 @@ public class Player : NetworkBehaviour
         if (NetworkObject.IsLocalPlayer)
             m_UIWiring.SetHealth(newValue);
     }
-
+    
+    [ServerRpc]
+    void Respawn_ServerRPC()
+    {
+        Health.Value = 10;
+        int spawnPoint = UnityEngine.Random.Range(0, m_SpawnPoints.SpanwnPointCount);
+        Respawn_ClientRPC(spawnPoint);
+    }
+    
     void Update()
     {
         if (NetworkObject.IsOwner)
-            HandleInput();
+        {
+            if (!IsAlive)
+            {
+                var keyboard = Keyboard.current;
+                if (keyboard.spaceKey.wasReleasedThisFrame)
+                {
+                    Respawn_ServerRPC();
+                }
+            }
+            else
+            {
+                HandleInput();
+            }
+        }
+
+        if (!IsAlive)
+            return;
 
         m_StepCountDown -= Time.deltaTime;
         if(m_StepCountDown <= 0f)
@@ -132,7 +161,7 @@ public class Player : NetworkBehaviour
             {
                 var player = hit.transform.GetComponent<Player>();
 
-                if (player == this)
+                if (player == this || !player.IsAlive)
                     return;
 
                 Debug.Log($"Hit player {player.name}");
@@ -177,6 +206,33 @@ public class Player : NetworkBehaviour
     public void Die_clientRPC()
     {
         if (NetworkObject.IsLocalPlayer)
-            Debug.Log("I died");
+        {
+            m_KinematicBody.enabled = false;
+            m_KinematicController.enabled = false;
+            //enabled = false;
+            m_UIWiring.SetHealth(0);
+        }
+
+        GetComponentInChildren<SkinnedMeshRenderer>().enabled = false;
+        GetComponent<CapsuleCollider>().enabled = false;
+    }
+
+    [ClientRpc]
+    public void Respawn_ClientRPC(int spawnLocation)
+    {
+        if (NetworkObject.IsLocalPlayer)
+        {
+            m_KinematicBody.enabled = true;
+            m_KinematicController.enabled = true;
+            m_UIWiring.SetHealth(10);
+
+            transform.position = m_SpawnPoints.GetSpawnLocation(spawnLocation);
+        }
+        else
+        {
+            GetComponentInChildren<SkinnedMeshRenderer>().enabled = true;
+        }
+
+        GetComponent<CapsuleCollider>().enabled = true;
     }
 }
