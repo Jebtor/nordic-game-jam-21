@@ -53,6 +53,7 @@ MonoBehaviour:
     RegisteredScenes:
     - SampleScene
     - Level_Cave
+    - MainMenu
     AllowRuntimeSceneChanges: 0
     NetworkPrefabs:
     - Prefab: {fileID: 4872563417114590452, guid: 7d058d9439a9e9845b231e99578f3b8e, type: 3}

@@ -80,13 +80,15 @@ public class SoundSources : NetworkBehaviour
 
     void Update()
     {
-        if (!m_OfflineMode && !NetworkManager.Singleton.IsHost && !NetworkManager.Singleton.IsConnectedClient)
-            return;
+        if (m_OfflineMode)
+            UploadToGPU();
+        else if (NetworkManager.Singleton.IsHost || NetworkManager.Singleton.IsConnectedClient)
+            UploadToGPU();
 
         //while (m_BufferStart < m_BufferEnd && Time.time > m_SoundSourcesCPU[m_BufferStart].time + m_SoundSourcesCPU[m_BufferStart].duration)
         //    m_BufferStart++;
 
-        UploadToGPU();
+        //        UploadToGPU();
     }
 
     public void SpawnSounceAt(float3 point)
@@ -101,11 +103,14 @@ public class SoundSources : NetworkBehaviour
             duration = 5f,
         };
 
-        var offlineMode = NetworkManager.Singleton == null;
-        if (!offlineMode)
+        if (!m_OfflineMode)
         {
-            if(NetworkManager.Singleton.IsHost)
-                m_SoundPositions.Add(soundSource.origin);
+            var offlineMode = NetworkManager.Singleton == null;
+            if (!offlineMode)
+            {
+                if (NetworkManager.Singleton.IsHost)
+                    m_SoundPositions.Add(soundSource.origin);
+            }
         }
 
         m_SoundSourcesCPU[m_BufferEnd] = soundSource;
