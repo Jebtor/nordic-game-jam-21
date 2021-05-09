@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class SpeakerBoi : NetworkBehaviour
 {
-    public float WaveSpawnInterval;
+    public float WaveSpawnInterval = 0.5f;
 
     public float MaxVolume = 1;
 
@@ -61,5 +61,6 @@ public class SpeakerBoi : NetworkBehaviour
     public void OnToggleChange(bool prevValue, bool newValue)
     {
         audioSourceMusic.volume = newValue ? 0 : MaxVolume;
+        GetComponent<Animator>().SetBool("Sound", newValue);
     }
 }

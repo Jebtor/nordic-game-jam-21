@@ -676,7 +676,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8247aa5ae3c8c2d4cb80ddd6136b062f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  WaveSpawnInterval: 0
+  WaveSpawnInterval: 0.5
   MaxVolume: 1
   IsMuted:
     m_InternalValue: 0
@@ -695,11 +695,11 @@ AudioSource:
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
-  Priority: 128
+  Priority: 113
   DopplerLevel: 1
   MinDistance: 1
   MaxDistance: 500
