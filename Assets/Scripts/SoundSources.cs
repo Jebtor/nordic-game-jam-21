@@ -92,7 +92,7 @@ public class SoundSources : NetworkBehaviour
     public void SpawnSounceAt(float3 point)
     {
         Debug.Assert(m_BufferEnd < k_Max);
-        Debug.Assert(m_OfflineMode || NetworkManager.Singleton.IsHost);
+        //Debug.Assert(m_OfflineMode || NetworkManager.Singleton.IsHost);
 
         var soundSource = new SoundSource
         {
@@ -101,8 +101,12 @@ public class SoundSources : NetworkBehaviour
             duration = 5f,
         };
 
-        if(!m_OfflineMode)
-            m_SoundPositions.Add(soundSource.origin);
+        var offlineMode = NetworkManager.Singleton == null;
+        if (!offlineMode)
+        {
+            if(NetworkManager.Singleton.IsHost)
+                m_SoundPositions.Add(soundSource.origin);
+        }
 
         m_SoundSourcesCPU[m_BufferEnd] = soundSource;
 
