@@ -9,13 +9,19 @@ public class SpeakerBoi : NetworkBehaviour
 
     public float MaxVolume = 1;
 
-    public NetworkVariableBool IsMuted = new NetworkVariableBool(false);
+    public NetworkVariableBool IsMuted = new NetworkVariableBool(s_Settings, false);
 
     public AudioSource audioSourceMusic;
 
     SoundSources m_SoundManager;
     float m_CurrentSpawnInterval;
 
+    static readonly NetworkVariableSettings s_Settings = new NetworkVariableSettings
+    {
+        ReadPermission = NetworkVariablePermission.Everyone,
+        WritePermission = NetworkVariablePermission.ServerOnly,
+        SendTickrate = 120f
+    };
 
     private void Start()
     {
