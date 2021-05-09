@@ -724,6 +724,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8312708004419429662, guid: 89467c1f70dd8344e8492faf0ede8fff, type: 3}
+      propertyPath: WaveSpawnInterval
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 89467c1f70dd8344e8492faf0ede8fff, type: 3}
 --- !u!1001 &276199421
@@ -3202,6 +3206,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -9.596
       objectReference: {fileID: 0}
+    - target: {fileID: 8312708004419429662, guid: 89467c1f70dd8344e8492faf0ede8fff, type: 3}
+      propertyPath: WaveSpawnInterval
+      value: 1.8
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 89467c1f70dd8344e8492faf0ede8fff, type: 3}
 --- !u!1001 &900592844
@@ -3261,7 +3269,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8312708004419429662, guid: 89467c1f70dd8344e8492faf0ede8fff, type: 3}
       propertyPath: WaveSpawnInterval
-      value: 0.7
+      value: 1.5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 89467c1f70dd8344e8492faf0ede8fff, type: 3}
@@ -4812,7 +4820,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8312708004419429662, guid: 89467c1f70dd8344e8492faf0ede8fff, type: 3}
       propertyPath: WaveSpawnInterval
-      value: 0.8
+      value: 1.8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 89467c1f70dd8344e8492faf0ede8fff, type: 3}
@@ -5939,7 +5947,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8312708004419429662, guid: 89467c1f70dd8344e8492faf0ede8fff, type: 3}
       propertyPath: WaveSpawnInterval
-      value: 0.8
+      value: 1.8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 89467c1f70dd8344e8492faf0ede8fff, type: 3}
@@ -6366,7 +6374,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8312708004419429662, guid: 89467c1f70dd8344e8492faf0ede8fff, type: 3}
       propertyPath: WaveSpawnInterval
-      value: 1
+      value: 1.5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 89467c1f70dd8344e8492faf0ede8fff, type: 3}
@@ -7182,7 +7190,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8312708004419429662, guid: 89467c1f70dd8344e8492faf0ede8fff, type: 3}
       propertyPath: WaveSpawnInterval
-      value: 1
+      value: 1.5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 89467c1f70dd8344e8492faf0ede8fff, type: 3}
@@ -7917,7 +7925,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8312708004419429662, guid: 89467c1f70dd8344e8492faf0ede8fff, type: 3}
       propertyPath: WaveSpawnInterval
-      value: 0.8
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 89467c1f70dd8344e8492faf0ede8fff, type: 3}
@@ -8051,7 +8059,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8312708004419429662, guid: 89467c1f70dd8344e8492faf0ede8fff, type: 3}
       propertyPath: WaveSpawnInterval
-      value: 0.7
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 89467c1f70dd8344e8492faf0ede8fff, type: 3}
@@ -8109,6 +8117,10 @@ PrefabInstance:
     - target: {fileID: 6760610002419944586, guid: 89467c1f70dd8344e8492faf0ede8fff, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8312708004419429662, guid: 89467c1f70dd8344e8492faf0ede8fff, type: 3}
+      propertyPath: WaveSpawnInterval
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 89467c1f70dd8344e8492faf0ede8fff, type: 3}
