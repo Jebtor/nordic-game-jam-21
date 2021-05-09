@@ -8,7 +8,7 @@ using System;
 
 public class SoundSources : NetworkBehaviour
 {
-    const int k_Max = 1024;
+    const int k_Max = 4096;
 
     [SerializeField] bool m_OfflineMode = false;
 
