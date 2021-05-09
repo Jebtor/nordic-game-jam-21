@@ -34,12 +34,12 @@ public class SpeakerBoi : NetworkBehaviour
 
     private void Update()
     {
-        if (!NetworkObject.IsOwner)
+        if (IsMuted.Value == true)
         {
             return;
         }
 
-        if (IsMuted.Value == true)
+        if (!NetworkObject.IsOwner)
         {
             return;
         }
@@ -48,13 +48,12 @@ public class SpeakerBoi : NetworkBehaviour
 
         if (m_CurrentSpawnInterval < 0)
         {
-            SpawnNewSoundAt_ServerRPC(transform.position);
+            SpawnNewSoundAt(transform.position);
             m_CurrentSpawnInterval = WaveSpawnInterval;
         }
     }
 
-    [ServerRpc]
-    public void SpawnNewSoundAt_ServerRPC(Vector3 point)
+    public void SpawnNewSoundAt(Vector3 point)
     {
         m_SoundManager.SpawnSounceAt(point);
     }
