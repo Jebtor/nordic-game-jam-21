@@ -1,9 +1,9 @@
 using MLAPI;
 using MLAPI.Messaging;
 using MLAPI.NetworkVariable;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UI;
 
 public class Player : NetworkBehaviour
 {
@@ -24,6 +24,7 @@ public class Player : NetworkBehaviour
     KinematicBody m_KinematicBody;
     KinematicController m_KinematicController;
     UIWiring m_UIWiring;
+    SpawnPoints m_SpawnPoints;
 
     bool m_IsGrounded;
 
@@ -42,6 +43,7 @@ public class Player : NetworkBehaviour
 
         m_SoundManager = FindObjectOfType<SoundSources>();
         m_UIWiring = FindObjectOfType<UIWiring>();
+        m_SpawnPoints = FindObjectOfType<SpawnPoints>();
         m_KinematicBody = GetComponent<KinematicBody>();
         m_KinematicController = GetComponent<KinematicController>();
         m_IsGrounded = m_KinematicBody.isGrounded;
@@ -59,6 +61,9 @@ public class Player : NetworkBehaviour
             m_UIWiring.SetHealth(Health.Value);
             GetComponentInChildren<SkinnedMeshRenderer>().enabled = false;
         }
+
+        int spawnPoint = UnityEngine.Random.Range(0, m_SpawnPoints.SpanwnPointCount);
+        transform.position = m_SpawnPoints.GetSpawnLocation(spawnPoint);
     }
 
     void OnHealthChanged(int prevValue, int newValue)
@@ -71,7 +76,8 @@ public class Player : NetworkBehaviour
     void Respawn_ServerRPC()
     {
         Health.Value = 10;
-        Respawn_ClientRPC();
+        int spawnPoint = UnityEngine.Random.Range(0, m_SpawnPoints.SpanwnPointCount);
+        Respawn_ClientRPC(spawnPoint);
     }
     
     void Update()
@@ -203,13 +209,15 @@ public class Player : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void Respawn_ClientRPC()
+    public void Respawn_ClientRPC(int spawnLocation)
     {
         if (NetworkObject.IsLocalPlayer)
         {
             m_KinematicBody.enabled = true;
             m_KinematicController.enabled = true;
             m_UIWiring.SetHealth(10);
+
+            transform.position = m_SpawnPoints.GetSpawnLocation(spawnLocation);
         }
         else
         {
