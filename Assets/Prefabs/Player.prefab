@@ -381,7 +381,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_CaptureMouse: 1
   m_StepSoundCoolDown: 1
-  m_ShootCooldown: 0.1
+  m_ShootCooldown: 0.33
   animatedAvatar: {fileID: 7515139910275465886}
 --- !u!114 &1222246016568530647
 MonoBehaviour:

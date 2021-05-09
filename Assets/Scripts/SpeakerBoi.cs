@@ -61,6 +61,6 @@ public class SpeakerBoi : NetworkBehaviour
     public void OnToggleChange(bool prevValue, bool newValue)
     {
         audioSourceMusic.volume = newValue ? 0 : MaxVolume;
-        GetComponent<Animator>().SetBool("Sound", newValue);
+        GetComponent<Animator>().SetBool("Sound", !newValue);
     }
 }
