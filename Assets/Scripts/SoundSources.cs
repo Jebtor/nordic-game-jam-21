@@ -10,6 +10,8 @@ public class SoundSources : NetworkBehaviour
 {
     const int k_Max = 1024;
 
+    [SerializeField] bool m_OfflineMode = false;
+
     [Serializable]
     struct SoundSource
     {
@@ -41,8 +43,11 @@ public class SoundSources : NetworkBehaviour
             SendTickrate = 120f,
         };
 
-        m_SoundPositions = new NetworkList<Vector3>(settings);
-        m_SoundPositions.OnListChanged += OnPositionsChanged;
+        if (!m_OfflineMode)
+        {
+            m_SoundPositions = new NetworkList<Vector3>(settings);
+            m_SoundPositions.OnListChanged += OnPositionsChanged;
+        }
 
         m_BufferStart = m_BufferEnd = 0;
     }
@@ -52,7 +57,8 @@ public class SoundSources : NetworkBehaviour
         m_SoundSourcesGPU?.Dispose();
         m_SoundSourcesCPU.Dispose();
 
-        m_SoundPositions.OnListChanged -= OnPositionsChanged;
+        if (!m_OfflineMode)
+            m_SoundPositions.OnListChanged -= OnPositionsChanged;
         m_BufferStart = m_BufferEnd = 0;
     }
 
@@ -74,7 +80,7 @@ public class SoundSources : NetworkBehaviour
 
     void Update()
     {
-        if (!NetworkManager.Singleton.IsHost && !NetworkManager.Singleton.IsConnectedClient)
+        if (!m_OfflineMode && !NetworkManager.Singleton.IsHost && !NetworkManager.Singleton.IsConnectedClient)
             return;
 
         //while (m_BufferStart < m_BufferEnd && Time.time > m_SoundSourcesCPU[m_BufferStart].time + m_SoundSourcesCPU[m_BufferStart].duration)
@@ -86,7 +92,7 @@ public class SoundSources : NetworkBehaviour
     public void SpawnSounceAt(float3 point)
     {
         Debug.Assert(m_BufferEnd < k_Max);
-        Debug.Assert(NetworkManager.Singleton.IsHost);
+        Debug.Assert(m_OfflineMode || NetworkManager.Singleton.IsHost);
 
         var soundSource = new SoundSource
         {
@@ -95,7 +101,9 @@ public class SoundSources : NetworkBehaviour
             duration = 5f,
         };
 
-        m_SoundPositions.Add(soundSource.origin);
+        if(!m_OfflineMode)
+            m_SoundPositions.Add(soundSource.origin);
+
         m_SoundSourcesCPU[m_BufferEnd] = soundSource;
 
         m_BufferEnd++;
