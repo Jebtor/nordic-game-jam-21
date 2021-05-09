@@ -25,7 +25,14 @@ public class Player : NetworkBehaviour
 
     bool m_IsGrounded;
 
-    NetworkVariableInt Health;
+    NetworkVariableInt Health = new NetworkVariableInt(s_Settings, 10);
+
+    static readonly NetworkVariableSettings s_Settings = new NetworkVariableSettings
+    {
+        ReadPermission = NetworkVariablePermission.Everyone,
+        WritePermission = NetworkVariablePermission.ServerOnly,
+        SendTickrate = 120f
+    };
 
     void Start()
     {
@@ -39,15 +46,6 @@ public class Player : NetworkBehaviour
 
         if (m_CaptureMouse)
             Cursor.lockState = CursorLockMode.Locked;
-
-        var settings = new NetworkVariableSettings 
-        { 
-            ReadPermission = NetworkVariablePermission.Everyone, 
-            WritePermission = NetworkVariablePermission.ServerOnly, 
-            SendTickrate = 120f 
-        };
-
-        Health = new NetworkVariableInt(settings, 10);
 
         Health.OnValueChanged += OnHealthChanged;
 
